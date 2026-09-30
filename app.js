@@ -4,18 +4,6 @@
   const MULTIPLIERS = [1, 1, 2, 3, 3];
   const EARTH_MI = 3958.8;
   const STORAGE_KEY = "maptap-usa-v1";
-  const STATE_NAMES = {
-    AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California", CO: "Colorado",
-    CT: "Connecticut", DE: "Delaware", DC: "District of Columbia", FL: "Florida", GA: "Georgia",
-    HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa", KS: "Kansas",
-    KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland", MA: "Massachusetts",
-    MI: "Michigan", MN: "Minnesota", MS: "Mississippi", MO: "Missouri", MT: "Montana",
-    NE: "Nebraska", NV: "Nevada", NH: "New Hampshire", NJ: "New Jersey", NM: "New Mexico",
-    NY: "New York", NC: "North Carolina", ND: "North Dakota", OH: "Ohio", OK: "Oklahoma",
-    OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina",
-    SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah", VT: "Vermont",
-    VA: "Virginia", WA: "Washington", WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming"
-  };
 
   // us-atlas "states-albers-10m" is pre-projected with exactly this projection.
   const projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
@@ -187,7 +175,7 @@
     setPrompt();
     const pts = score * MULTIPLIERS[i];
     $("result").innerHTML =
-      `<b>${fmtMi(mi)}</b> away · ${STATE_NAMES[p.state]} · ` +
+      `<b>${fmtMi(mi)}</b> away · ` +
       `<b>${score}</b>${MULTIPLIERS[i] > 1 ? ` ×${MULTIPLIERS[i]} = <b>${pts}</b>` : ""} pts`;
     if (round() < places.length) setAction("Next place →", true, startRound);
     else setAction("See results", true, finish);
@@ -238,16 +226,6 @@
 
   function showSummary() {
     $("final-score").textContent = total(game.guesses);
-    $("final-rounds").innerHTML = "";
-    game.guesses.forEach((g, i) => {
-      const row = document.createElement("div");
-      const name = document.createElement("span");
-      name.textContent = places[i].name;
-      const val = document.createElement("span");
-      val.textContent = `${fmtMi(g.mi)} · ${g.score * MULTIPLIERS[i]}`;
-      row.append(name, val);
-      $("final-rounds").appendChild(row);
-    });
     const s = computeStats();
     $("stats").innerHTML =
       `<div><b>${s.played}</b>played</div><div><b>${s.avg}</b>average</div>` +
