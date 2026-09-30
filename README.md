@@ -27,3 +27,7 @@ Map data: [us-atlas](https://github.com/topojson/us-atlas) (Census Bureau). Libr
 ## City games (`atx/`, `nyc/`, `chi/`)
 
 ATX Tap (Austin), NYC Tap and Chicago Tap run on Mapbox (street names shown, place labels hidden). Shared code lives in `city/` (`app.js`, `city.css`, `config.js` with the Mapbox public token). Each city folder (`atx/`, `nyc/`, `chi/`) has its own `index.html` (with a small `window.CITY` settings block: save key, map area, map style), `challenges.js`, and a theme stylesheet. Open e.g. `chi/?review` to see every place on the map and check coordinates.
+
+## Bet Tap (`bet/`)
+
+World-map betting game on a Mapbox globe (no labels). 10 places a day, the same for everyone: day N takes the next 10 places from one fixed shuffle of `bet/places.js`. Start with 1,000 chips; each place has a line (`r`, miles) and a payout (`pays`, profit × bet). Bet, tap, win or lose; cash out any time. Uses the shared Mapbox token in `city/config.js`.
