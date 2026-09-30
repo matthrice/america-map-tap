@@ -98,6 +98,7 @@ main {
 .guess-pin { fill: var(--accent); stroke: var(--bg); }
 .answer-pin { fill: var(--answer); stroke: var(--bg); }
 .link-line { stroke: var(--muted); fill: none; }
+.ripple { fill: none; stroke: var(--accent); pointer-events: none; }
 .answer-label {
   fill: var(--text);
   font-weight: 600;
@@ -163,7 +164,10 @@ dialog form { margin-top: 8px; }
 }
 #toast.show { opacity: 1; }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
   #date-label { display: none; }
+  /* Phones: map sized to the US's shape, everything centered vertically. */
+  main { justify-content: center; }
+  #map-wrap { flex: none; aspect-ratio: 1020 / 600; min-height: 0; }
   #rounds, #prompt, #panel { padding: 0 16px; }
 }

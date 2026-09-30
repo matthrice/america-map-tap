@@ -3,7 +3,7 @@
 
   const MULTIPLIERS = [1, 1, 2, 3, 3];
   const EARTH_MI = 3958.8;
-  const STORAGE_KEY = "maptap-usa-v1";
+  const STORAGE_KEY = "maptap-usa-v2";
 
   // us-atlas "states-albers-10m" is pre-projected with exactly this projection.
   const projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
@@ -41,8 +41,8 @@
 
   // ---------- Scoring ----------
   const distanceMi = (a, b) => d3.geoDistance([a.lon, a.lat], [b.lon, b.lat]) * EARTH_MI;
-  // 0 mi → 100, ~30 mi → 90, ~210 mi → 50, ~700 mi → 3.
-  const roundScore = (mi) => Math.max(0, Math.round(100 * Math.exp(-mi / 300)));
+  // 0 mi → 100, ~20 mi → 90, ~140 mi → 50, ~460 mi → 10.
+  const roundScore = (mi) => Math.max(0, Math.round(100 * Math.exp(-mi / 200)));
   const total = (guesses) => guesses.reduce((s, g, i) => s + g.score * MULTIPLIERS[i], 0);
   const tier = (score) => (score >= 80 ? "good" : score >= 40 ? "ok" : "bad");
   const tierEmoji = { good: "🟢", ok: "🟡", bad: "🔴" };
@@ -67,37 +67,51 @@
   zoom.on("end", () => svg.classed("dragging", false));
   svg.call(zoom).on("dblclick.zoom", null);
 
-  // Initial view: whole map, with a little margin. On phone-width screens zoom in
-  // up to 1.6x so the map fills more of the height — drag to reach the coasts.
+  // Initial view: whole map, centered, with a little margin.
   function fitTransform() {
     const { width, height } = svg.node().getBoundingClientRect();
     const [[x0, y0], [x1, y1]] = BOUNDS;
-    const contain = 0.95 * Math.min(width / (x1 - x0), height / (y1 - y0));
-    const s = width < 600 ? Math.min(height / (y1 - y0), contain * 1.6) : contain;
-    const [cx, cy] = s > contain ? [487.5, 305] : [(x0 + x1) / 2, (y0 + y1) / 2];
-    return d3.zoomIdentity.translate(width / 2 - s * cx, height / 2 - s * cy).scale(s);
-  }
-  function fullScale() {
-    const { width, height } = svg.node().getBoundingClientRect();
-    const [[x0, y0], [x1, y1]] = BOUNDS;
-    return Math.min(width / (x1 - x0), height / (y1 - y0));
+    const s = 0.95 * Math.min(width / (x1 - x0), height / (y1 - y0));
+    return d3.zoomIdentity
+      .translate(width / 2 - s * (x0 + x1) / 2, height / 2 - s * (y0 + y1) / 2)
+      .scale(s);
   }
   function resetView(animate) {
     const t = fitTransform();
-    minK = Math.min(t.k, fullScale()) * 0.8;
-    zoom.extent([[0, 0], [svg.node().clientWidth, svg.node().clientHeight]]).scaleExtent([minK, t.k * 15]);
+    minK = t.k * 0.8;
+    // Size from the rect: Safari/Firefox report clientWidth/clientHeight as 0 on <svg>.
+    const { width, height } = svg.node().getBoundingClientRect();
+    zoom.extent([[0, 0], [width, height]]).scaleExtent([minK, t.k * 15]);
     (animate ? svg.transition().duration(400) : svg).call(zoom.transform, t);
+  }
+  // After a guess, zoom out (never in) just enough to show both the guess and the answer.
+  function showBoth(a, b) {
+    const pa = projection([a.lon, a.lat]), pb = projection([b.lon, b.lat]);
+    if (!pa || !pb) return;
+    const { width, height } = svg.node().getBoundingClientRect();
+    const cur = d3.zoomTransform(svg.node());
+    const pad = 60;
+    const bw = Math.abs(pa[0] - pb[0]) || 1, bh = Math.abs(pa[1] - pb[1]) || 1;
+    const s = Math.max(minK, Math.min(cur.k, (width - 2 * pad) / bw, (height - 2 * pad) / bh));
+    const inView = [pa, pb].every(([x, y]) => {
+      const [sx, sy] = cur.apply([x, y]);
+      return sx > pad / 2 && sx < width - pad / 2 && sy > pad / 2 && sy < height - pad / 2;
+    });
+    if (inView) return;
+    const mx = (pa[0] + pb[0]) / 2, my = (pa[1] + pb[1]) / 2;
+    svg.transition().duration(500)
+      .call(zoom.transform, d3.zoomIdentity.translate(width / 2 - s * mx, height / 2 - s * my).scale(s));
   }
   $("reset-zoom").onclick = () => resetView(true);
   // Refit only when the width changes, so mobile address-bar show/hide doesn't reset the view.
   let lastWidth = 0;
   new ResizeObserver(() => {
-    const w = svg.node().clientWidth;
+    const w = svg.node().getBoundingClientRect().width;
     if (w !== lastWidth) { lastWidth = w; resetView(false); }
   }).observe(svg.node());
 
   function rescaleMarks() {
-    marksLayer.selectAll("circle").attr("r", 7 / k).attr("stroke-width", 2 / k);
+    marksLayer.selectAll("circle:not(.ripple)").attr("r", 7 / k).attr("stroke-width", 2 / k);
     marksLayer.selectAll("line").attr("stroke-width", 2 / k).attr("stroke-dasharray", `${5 / k} ${4 / k}`);
     marksLayer.selectAll("text").attr("font-size", 15 / k).attr("stroke-width", 4 / k).attr("dy", -12 / k);
   }
@@ -160,6 +174,32 @@
     drawPin("answer-pin", p, withLabel ? p.name : null);
   }
 
+  // Select effect: ripple at the tap, guess pin pops, line draws to the answer, answer pops.
+  function animateReveal() {
+    const guessPin = marksLayer.select(".guess-pin");
+    const answerPin = marksLayer.select(".answer-pin");
+    const line = marksLayer.select(".link-line");
+    const label = marksLayer.select(".answer-label");
+    const r = 7 / k;
+    marksLayer.insert("circle", ":first-child").attr("class", "ripple")
+      .attr("cx", guessPin.attr("cx")).attr("cy", guessPin.attr("cy"))
+      .attr("r", r).attr("stroke-width", 2 / k).style("opacity", 0.6)
+      .transition().duration(600).ease(d3.easeCubicOut)
+      .attr("r", 36 / k).style("opacity", 0).remove();
+    guessPin.attr("r", 0).transition().duration(250).ease(d3.easeBackOut.overshoot(3)).attr("r", r);
+    const lineMs = 450;
+    if (!line.empty()) {
+      const [x1, y1, x2, y2] = ["x1", "y1", "x2", "y2"].map((a) => line.attr(a));
+      line.attr("x2", x1).attr("y2", y1)
+        .transition().delay(150).duration(lineMs).ease(d3.easeCubicInOut)
+        .attr("x2", x2).attr("y2", y2);
+    }
+    answerPin.attr("r", 0).transition().delay(150 + lineMs).duration(300)
+      .ease(d3.easeBackOut.overshoot(3)).attr("r", r)
+      .on("end", rescaleMarks); // re-sync sizes if the view zoomed meanwhile
+    label.style("opacity", 0).transition().delay(150 + lineMs).duration(250).style("opacity", 1);
+  }
+
   function clearMarks() { marksLayer.selectAll("*").remove(); }
 
   function setAction(text, enabled, handler) {
@@ -197,6 +237,8 @@
     clearMarks();
     drawRound(i, true);
     rescaleMarks();
+    animateReveal();
+    showBoth(pt, p);
     renderRounds();
     setPrompt();
     const pts = score * MULTIPLIERS[i];
