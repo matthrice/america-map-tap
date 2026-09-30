@@ -111,6 +111,15 @@
   let markers = [];
   let lineAnim = 0;
 
+  // Mapbox positions a marker by setting `transform` on its element, so the animated
+  // pin/ripple is an inner element; animating the outer one would pin it to the corner.
+  function markerAt(pt, inner) {
+    const wrap = document.createElement("div");
+    wrap.className = "marker";
+    wrap.appendChild(inner);
+    return new mapboxgl.Marker({ element: wrap }).setLngLat([pt.lon, pt.lat]).addTo(map);
+  }
+
   function addMarker(cls, pt, label, delay) {
     const el = document.createElement("div");
     el.className = `pin ${cls}`;
@@ -121,13 +130,15 @@
       l.textContent = label;
       el.appendChild(l);
     }
-    markers.push(new mapboxgl.Marker({ element: el }).setLngLat([pt.lon, pt.lat]).addTo(map));
+    const m = markerAt(pt, el);
+    if (cls === "answer") m.getElement().style.zIndex = 1;
+    markers.push(m);
   }
 
   function ripple(pt) {
     const el = document.createElement("div");
     el.className = "ripple";
-    const m = new mapboxgl.Marker({ element: el }).setLngLat([pt.lon, pt.lat]).addTo(map);
+    const m = markerAt(pt, el);
     setTimeout(() => m.remove(), 700);
   }
 

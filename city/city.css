@@ -3,7 +3,10 @@
 #map .mapboxgl-canvas-container { cursor: crosshair; }
 #map .mapboxgl-canvas-container:active { cursor: grabbing; }
 
-/* Pins are HTML markers so they can animate with CSS. */
+/* Pins are HTML markers so they can animate with CSS. The .marker wrapper is what
+   Mapbox positions (via transform); the .pin / .ripple inside it animate. */
+.marker { width: 18px; height: 18px; }
+.pin, .ripple { position: relative; box-sizing: border-box; }
 .pin {
   width: 18px; height: 18px;
   border-radius: 50%;
@@ -45,3 +48,11 @@
 #setup div { max-width: 420px; }
 #setup h2 { font: 700 1.4rem var(--display); text-transform: uppercase; letter-spacing: .06em; }
 #setup code { background: var(--paper-2); padding: 1px 5px; border-radius: 4px; }
+
+/* Keep the shared big-button styling off Mapbox's own controls (attribution "i" button). */
+.mapboxgl-ctrl button {
+  min-width: 0; padding: 0; border-radius: 0;
+  box-shadow: none; background-color: transparent;
+  font: inherit; letter-spacing: normal; text-transform: none;
+}
+.mapboxgl-ctrl button:active { transform: none; }
