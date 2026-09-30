@@ -8,10 +8,11 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23e2692a'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Shrikhand&family=Work+Sans:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css">
-  <link rel="stylesheet" href="../style.css?v=4">
-  <link rel="stylesheet" href="../city/city.css?v=4">
+  <link rel="stylesheet" href="../style.css?v=5">
+  <link rel="stylesheet" href="../city/city.css?v=5">
+  <link rel="stylesheet" href="atx.css?v=5">
 </head>
 <body>
   <header>
@@ -20,6 +21,7 @@
       <span id="date-label"></span>
       <a class="link-btn" href="../">USA</a>
       <a class="link-btn" href="../nyc/">NYC</a>
+      <a class="link-btn" href="../chi/">CHI</a>
       <button id="archive-btn" class="link-btn">Archive</button>
       <button id="help-btn" class="link-btn">Help</button>
     </div>
@@ -73,12 +75,13 @@
     window.CITY = {
       storageKey: "atx-tap-v1",
       shareTitle: "🤠 ATX Tap",
+      mapStyle: "mapbox://styles/mapbox/outdoors-v12",
       startBounds: [[-97.96, 30.13], [-97.62, 30.48]],
       maxBounds: [[-98.35, 29.9], [-97.3, 30.75]]
     };
   </script>
-  <script src="../city/config.js?v=4"></script>
-  <script src="challenges.js?v=4"></script>
-  <script src="../city/app.js?v=4"></script>
+  <script src="../city/config.js?v=5"></script>
+  <script src="challenges.js?v=5"></script>
+  <script src="../city/app.js?v=5"></script>
 </body>
 </html>

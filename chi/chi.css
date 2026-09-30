@@ -1,0 +1,68 @@
+/* Chicago Tap: CTA 'L' theme over the shared styles.
+   Dark station-sign header with a stripe of the eight 'L' line colors, line-badge round
+   markers, Blue Line buttons and a Pink Line guess trail. Map uses Mapbox dark. */
+:root {
+  --red-line: #c60c30; --blue-line: #00a1de; --brown-line: #62361b; --green-line: #009b3a;
+  --orange-line: #f9461c; --purple-line: #522398; --pink-line: #e27ea6; --yellow-line: #f9e300;
+  --paper: #f1f1f1;
+  --paper-2: #dcdcdc;
+  --ink: #1c1c1c;
+  --muted: #6a6a6a;
+  --forest: #1c1c1c;
+  --land: var(--green-line);  /* good round */
+  --gold: var(--yellow-line); /* ok round */
+  --rust: var(--red-line);    /* bad round */
+  --orange: var(--pink-line); /* guess -> answer line */
+  --guess: var(--blue-line);
+  --answer: var(--yellow-line);
+  --shadow: 0 2px 0 rgba(0, 0, 0, .3);
+  --display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #1b1b1b; --paper-2: #2c2c2c; --ink: #f1f1f1; --muted: #9c9c9c; --forest: #0d0d0d; }
+}
+
+body { background: #242424; }
+header {
+  background: #1c1c1c; color: #fff;
+  border-bottom: 6px solid transparent;
+  border-image: linear-gradient(90deg,
+    var(--red-line) 0 12.5%, var(--blue-line) 0 25%, var(--brown-line) 0 37.5%, var(--green-line) 0 50%,
+    var(--orange-line) 0 62.5%, var(--purple-line) 0 75%, var(--pink-line) 0 87.5%, var(--yellow-line) 0) 1;
+}
+h1 { font-weight: 700; text-transform: none; letter-spacing: -.01em; }
+h1 span { color: var(--blue-line); }
+
+/* CTA station sign: dark panel, white text, a line-color bar on the left */
+#prompt {
+  background: #1c1c1c; color: #fff;
+  border-radius: 3px;
+  border-left: 8px solid var(--blue-line);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .4);
+}
+#prompt-name { font-weight: 700; text-transform: none; letter-spacing: -.01em; }
+#prompt-label { color: #bdbdbd; }
+
+/* Round markers as 'L' line badges */
+.round-dot {
+  border-radius: 3px; border: 2px solid #fff;
+  background: #3a3a3a; color: #fff;
+  font-weight: 700; min-width: 38px;
+}
+.round-dot.current { background: var(--blue-line); border-color: #fff; color: #fff; }
+.round-dot.good { background: var(--green-line); border-color: var(--green-line); color: #fff; }
+.round-dot.ok { background: var(--yellow-line); border-color: var(--yellow-line); color: #1c1c1c; }
+.round-dot.bad { background: var(--red-line); border-color: var(--red-line); color: #fff; }
+
+button { background: var(--blue-line); color: #fff; border-radius: 3px; text-transform: none; letter-spacing: 0; font-weight: 700; }
+#reset-zoom { background: #1c1c1c; color: #fff; border-color: #fff; border-radius: 3px; }
+#result { background: #1c1c1c; color: #bdbdbd; border-color: #fff; border-radius: 3px; text-transform: none; letter-spacing: 0; }
+#result b { color: #fff; }
+dialog { border-color: #1c1c1c; border-radius: 4px; }
+dialog h2 { background: #1c1c1c; color: #fff; border-bottom: 6px solid var(--blue-line); text-transform: none; letter-spacing: 0; }
+#final-score { color: var(--blue-line); }
+
+.pin { border-color: #fff; }
+.pin.answer { border-color: #1c1c1c; }
+.pin .label { color: #fff; background: #1c1c1c; border-color: #fff; border-radius: 3px; font-weight: 700; text-transform: none; letter-spacing: 0; }

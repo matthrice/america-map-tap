@@ -245,6 +245,8 @@ dialog form { margin-top: 8px; }
 
 @media (max-width: 600px) {
   #date-label { display: none; }
+  .header-right { gap: 9px; }
+  .header-right .link-btn { font-size: .72rem; letter-spacing: .04em; }
   h1 { font-size: 1.25rem; }
   #prompt-name { font-size: 1.4rem; }
   .round-dot { min-width: 36px; }

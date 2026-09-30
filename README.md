@@ -24,6 +24,6 @@ Served directly from the repo root. One-time setup: **Settings → Pages → Sou
 
 Map data: [us-atlas](https://github.com/topojson/us-atlas) (Census Bureau). Libraries: d3, topojson-client (vendored).
 
-## City games (`atx/`, `nyc/`)
+## City games (`atx/`, `nyc/`, `chi/`)
 
-ATX Tap (Austin) and NYC Tap run on Mapbox (street names shown, place labels hidden). Shared code lives in `city/` (`app.js`, `city.css`, `config.js` with the Mapbox public token). Each city folder has its own `index.html` (with a small `window.CITY` settings block: save key, map area, map style), `challenges.js`, and optional theme CSS (`nyc/nyc.css`). Open `atx/?review` or `nyc/?review` to see every place on the map and check coordinates.
+ATX Tap (Austin), NYC Tap and Chicago Tap run on Mapbox (street names shown, place labels hidden). Shared code lives in `city/` (`app.js`, `city.css`, `config.js` with the Mapbox public token). Each city folder (`atx/`, `nyc/`, `chi/`) has its own `index.html` (with a small `window.CITY` settings block: save key, map area, map style), `challenges.js`, and a theme stylesheet. Open e.g. `chi/?review` to see every place on the map and check coordinates.

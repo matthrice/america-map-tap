@@ -1,0 +1,77 @@
+/* ATX Tap: retro Austin gig-poster theme over the shared styles.
+   Burnt orange + teal, a 70s sunset stripe, Shrikhand display type, Hill Country (outdoors) map. */
+:root {
+  --paper: #fbf1e1;
+  --paper-2: #f1dfc2;
+  --ink: #2a1a12;
+  --muted: #7a5c48;
+  --forest: #bf5700;   /* burnt orange */
+  --land: #1f8a86;     /* good round: teal */
+  --gold: #f6b53c;     /* ok round: sunset gold */
+  --rust: #c8385a;     /* bad round: sunset pink-red */
+  --orange: #1f8a86;   /* guess -> answer line: teal */
+  --guess: #1f8a86;
+  --answer: #f6b53c;
+  --shadow: 3px 3px 0 #2a1a12;
+  --display: "Shrikhand", "Cooper Black", Georgia, serif;
+  --body: "Work Sans", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #2a1a12; --paper-2: #3b271c; --ink: #fbf1e1; --muted: #cfae92; --shadow: 3px 3px 0 #000; }
+}
+
+header {
+  background: #bf5700; color: #fbf1e1;
+  border-bottom: 0;
+  box-shadow: 0 3px 0 #f6b53c, 0 6px 0 #ef7d3c, 0 9px 0 #c8385a, 0 12px 0 #6b3a8c; /* 70s sunset stripes */
+}
+h1 { font-weight: 400; text-transform: none; letter-spacing: .01em; font-size: 1.6rem; }
+h1 span { color: #fbf1e1; text-shadow: 2px 2px 0 #6b3a8c; }
+.link-btn { font-family: var(--body); font-weight: 600; }
+
+#prompt {
+  background: #fbf1e1; color: #2a1a12;
+  border: 3px solid #2a1a12; border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+#prompt-label { color: #bf5700; font-family: var(--body); font-weight: 600; }
+#prompt-name { font-weight: 400; text-transform: none; letter-spacing: .01em; }
+
+.round-dot {
+  border: 3px solid #2a1a12; border-radius: 12px;
+  background: #fbf1e1; color: #2a1a12;
+  font-family: var(--body); font-weight: 700;
+}
+.round-dot.current { background: #bf5700; color: #fbf1e1; border-color: #2a1a12; }
+.round-dot.good { background: var(--land); color: #fff; border-color: #2a1a12; }
+.round-dot.ok { background: var(--gold); color: #2a1a12; border-color: #2a1a12; }
+.round-dot.bad { background: var(--rust); color: #fff; border-color: #2a1a12; }
+
+button {
+  background: #bf5700; color: #fbf1e1;
+  border: 3px solid #2a1a12; border-radius: 999px;
+  font-family: var(--display); font-weight: 400; text-transform: none; letter-spacing: .02em;
+}
+button.secondary { border: 0; }
+#reset-zoom { background: #fbf1e1; color: #2a1a12; border: 3px solid #2a1a12; font-family: var(--body); font-weight: 700; }
+#result { background: #fbf1e1; color: var(--muted); border: 3px solid #2a1a12; box-shadow: var(--shadow); font-family: var(--body); text-transform: none; letter-spacing: 0; }
+#result b { color: #2a1a12; }
+dialog { border-color: #2a1a12; border-radius: 18px; }
+dialog h2 {
+  background: #bf5700; color: #fbf1e1; font-weight: 400; text-transform: none; letter-spacing: .02em;
+  border-bottom: 0;
+  box-shadow: 0 3px 0 #f6b53c, 0 6px 0 #ef7d3c, 0 9px 0 #c8385a, 0 12px 0 #6b3a8c; /* 70s sunset stripes */
+}
+dialog h2 { margin-bottom: 28px; }
+#final-score { color: #bf5700; font-weight: 400; }
+#stats div, #stats b { font-family: var(--body); }
+
+.pin { border-color: #2a1a12; }
+.pin .label { color: #2a1a12; background: #fbf1e1; border: 2px solid #2a1a12; border-radius: 999px; font-family: var(--display); font-weight: 400; text-transform: none; letter-spacing: .02em; }
+
+#top { top: 24px; } /* clear the header stripes */
+@media (max-width: 600px) {
+  .round-dot { min-width: 34px; padding: 1px 5px; border-width: 2px; }
+  #rounds { gap: 4px; }
+  #reset-zoom { top: 22px; border-width: 2px; }
+}
