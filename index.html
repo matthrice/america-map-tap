@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>MapTap USA</title>
   <meta name="description" content="A daily US geography game. Tap the map where you think 5 places are.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23111'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23e8702a'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>MapTap USA</h1>
+    <h1>MapTap <span>USA</span></h1>
     <div class="header-right">
       <span id="date-label"></span>
       <button id="archive-btn" class="link-btn">Archive</button>
@@ -18,16 +21,16 @@
     </div>
   </header>
 
-  <main>
-    <div id="rounds" aria-label="Rounds"></div>
-    <div id="prompt">
-      <div id="prompt-label">Tap the map</div>
-      <div id="prompt-name">Loading…</div>
+  <main id="stage">
+    <svg id="map" viewBox="-60 -70 1020 750" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="top">
+      <div id="rounds" aria-label="Rounds"></div>
+      <div id="prompt">
+        <div id="prompt-label">Tap the map</div>
+        <div id="prompt-name">Loading…</div>
+      </div>
     </div>
-    <div id="map-wrap">
-      <svg id="map"></svg>
-      <button id="reset-zoom" class="link-btn">Reset zoom</button>
-    </div>
+    <button id="reset-zoom" class="link-btn" title="Reset zoom" aria-label="Reset zoom">Reset</button>
     <div id="panel">
       <div id="result"></div>
       <button id="action-btn" style="visibility:hidden">Next</button>

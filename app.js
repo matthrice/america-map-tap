@@ -49,71 +49,54 @@
   const fmtMi = (mi) => (mi < 10 ? mi.toFixed(1) : Math.round(mi).toLocaleString()) + " mi";
 
   // ---------- Map ----------
-  // Map content lives in projected coordinates; the zoom transform maps it to screen pixels.
+  // The SVG viewBox frames the whole map, so the browser does the fitting; no JS
+  // size measurement. The zoom transform is in viewBox units (identity = whole map).
   // Drag to pan, wheel/pinch to zoom, click/tap (without dragging) to guess.
-  const BOUNDS = [[-60, 10], [960, 610]]; // lower 48 + Alaska/Hawaii insets
+  const VIEW = [-60, -70, 1020, 750]; // map + room for the floating prompt/panel (matches the viewBox)
   const SLACK = 250; // how far past the map edges you can drag
-  let k = 1; // current zoom scale
-  let minK = 1;
   const zoom = d3.zoom()
     .clickDistance(5)
-    .translateExtent([[BOUNDS[0][0] - SLACK, BOUNDS[0][1] - SLACK], [BOUNDS[1][0] + SLACK, BOUNDS[1][1] + SLACK]])
+    .scaleExtent([0.8, 15])
+    .translateExtent([[VIEW[0] - SLACK, VIEW[1] - SLACK], [VIEW[0] + VIEW[2] + SLACK, VIEW[1] + VIEW[3] + SLACK]])
     .on("zoom", (e) => {
       if (e.sourceEvent?.type === "mousemove") svg.classed("dragging", true);
-      k = e.transform.k;
       zoomLayer.attr("transform", e.transform);
       rescaleMarks();
-    });
-  zoom.on("end", () => svg.classed("dragging", false));
+    })
+    .on("end", () => svg.classed("dragging", false));
   svg.call(zoom).on("dblclick.zoom", null);
+  $("reset-zoom").onclick = () => svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity);
 
-  // Initial view: whole map, centered, with a little margin.
-  function fitTransform() {
-    const { width, height } = svg.node().getBoundingClientRect();
-    const [[x0, y0], [x1, y1]] = BOUNDS;
-    const s = 0.95 * Math.min(width / (x1 - x0), height / (y1 - y0));
-    return d3.zoomIdentity
-      .translate(width / 2 - s * (x0 + x1) / 2, height / 2 - s * (y0 + y1) / 2)
-      .scale(s);
+  // Map units per screen pixel, so pins/labels stay a constant on-screen size.
+  function unit() {
+    const m = zoomLayer.node().getScreenCTM();
+    return m && m.a > 0 ? 1 / m.a : 1;
   }
-  function resetView(animate) {
-    const t = fitTransform();
-    minK = t.k * 0.8;
-    // Size from the rect: Safari/Firefox report clientWidth/clientHeight as 0 on <svg>.
-    const { width, height } = svg.node().getBoundingClientRect();
-    zoom.extent([[0, 0], [width, height]]).scaleExtent([minK, t.k * 15]);
-    (animate ? svg.transition().duration(400) : svg).call(zoom.transform, t);
-  }
+
   // After a guess, zoom out (never in) just enough to show both the guess and the answer.
   function showBoth(a, b) {
     const pa = projection([a.lon, a.lat]), pb = projection([b.lon, b.lat]);
     if (!pa || !pb) return;
-    const { width, height } = svg.node().getBoundingClientRect();
+    const [x0, y0, w, h] = VIEW;
+    const pad = 150;
     const cur = d3.zoomTransform(svg.node());
-    const pad = 60;
-    const bw = Math.abs(pa[0] - pb[0]) || 1, bh = Math.abs(pa[1] - pb[1]) || 1;
-    const s = Math.max(minK, Math.min(cur.k, (width - 2 * pad) / bw, (height - 2 * pad) / bh));
-    const inView = [pa, pb].every(([x, y]) => {
-      const [sx, sy] = cur.apply([x, y]);
-      return sx > pad / 2 && sx < width - pad / 2 && sy > pad / 2 && sy < height - pad / 2;
+    const inView = [pa, pb].every((pt) => {
+      const [x, y] = cur.apply(pt);
+      return x > x0 + pad && x < x0 + w - pad && y > y0 + pad && y < y0 + h - pad;
     });
     if (inView) return;
+    const bw = Math.abs(pa[0] - pb[0]) || 1, bh = Math.abs(pa[1] - pb[1]) || 1;
+    const s = Math.max(0.8, Math.min(cur.k, (w - 2 * pad) / bw, (h - 2 * pad) / bh));
     const mx = (pa[0] + pb[0]) / 2, my = (pa[1] + pb[1]) / 2;
-    svg.transition().duration(500)
-      .call(zoom.transform, d3.zoomIdentity.translate(width / 2 - s * mx, height / 2 - s * my).scale(s));
+    svg.transition().duration(500).call(zoom.transform,
+      d3.zoomIdentity.translate(x0 + w / 2 - s * mx, y0 + h / 2 - s * my).scale(s));
   }
-  $("reset-zoom").onclick = () => resetView(true);
-  // Refit only when the width changes, so mobile address-bar show/hide doesn't reset the view.
-  let lastWidth = 0;
-  new ResizeObserver(() => {
-    const w = svg.node().getBoundingClientRect().width;
-    if (w !== lastWidth) { lastWidth = w; resetView(false); }
-  }).observe(svg.node());
 
   function rescaleMarks() {
-    marksLayer.selectAll("circle:not(.ripple)").attr("r", 7 / k).attr("stroke-width", 2 / k);
-    marksLayer.selectAll("line").attr("stroke-width", 2 / k).attr("stroke-dasharray", `${5 / k} ${4 / k}`);
-    marksLayer.selectAll("text").attr("font-size", 15 / k).attr("stroke-width", 4 / k).attr("dy", -12 / k);
+    const u = unit();
+    marksLayer.selectAll("circle:not(.ripple)").attr("r", 8 * u).attr("stroke-width", 2.5 * u);
+    marksLayer.selectAll("line").attr("stroke-width", 2.5 * u).attr("stroke-dasharray", `${6 * u} ${5 * u}`);
+    marksLayer.selectAll("text").attr("font-size", 17 * u).attr("stroke-width", 5 * u).attr("dy", -14 * u);
   }
 
   async function drawMap() {
@@ -138,7 +121,7 @@
       const d = document.createElement("div");
       d.className = "round-dot";
       const g = game.guesses[i];
-      if (g) { d.classList.add("done"); d.textContent = g.score; }
+      if (g) { d.classList.add(tier(g.score)); d.textContent = g.score; }
       else { d.textContent = `×${MULTIPLIERS[i]}`; }
       if (i === round() && !revealed) d.classList.add("current");
       if (revealed && i === round() - 1) d.classList.add("current");
@@ -180,12 +163,12 @@
     const answerPin = marksLayer.select(".answer-pin");
     const line = marksLayer.select(".link-line");
     const label = marksLayer.select(".answer-label");
-    const r = 7 / k;
+    const u = unit(), r = 8 * u;
     marksLayer.insert("circle", ":first-child").attr("class", "ripple")
       .attr("cx", guessPin.attr("cx")).attr("cy", guessPin.attr("cy"))
-      .attr("r", r).attr("stroke-width", 2 / k).style("opacity", 0.6)
-      .transition().duration(600).ease(d3.easeCubicOut)
-      .attr("r", 36 / k).style("opacity", 0).remove();
+      .attr("r", r).attr("stroke-width", 3 * u).style("opacity", 0.8)
+      .transition().duration(650).ease(d3.easeCubicOut)
+      .attr("r", 44 * u).style("opacity", 0).remove();
     guessPin.attr("r", 0).transition().duration(250).ease(d3.easeBackOut.overshoot(3)).attr("r", r);
     const lineMs = 450;
     if (!line.empty()) {
