@@ -3,11 +3,11 @@
 // Cities are shown as "Name, ST"; `landmark: true` entries are shown without the state.
 window.CHALLENGES = {
   "2026-09-30": [
-    { name: "Chicago", state: "IL", lat: 41.8781, lon: -87.6298 },
-    { name: "Mount Rushmore", state: "SD", lat: 43.8791, lon: -103.4591, landmark: true },
-    { name: "Savannah", state: "GA", lat: 32.0809, lon: -81.0912 },
-    { name: "Twin Falls", state: "ID", lat: 42.5629, lon: -114.4609 },
-    { name: "Kodiak", state: "AK", lat: 57.79, lon: -152.4072 }
+    { name: "Pittsburgh", state: "PA", lat: 40.4406, lon: -79.9959 },
+    { name: "Mount St. Helens", state: "WA", lat: 46.1914, lon: -122.1956, landmark: true },
+    { name: "Fargo", state: "ND", lat: 46.8772, lon: -96.7898 },
+    { name: "Brownsville", state: "TX", lat: 25.9017, lon: -97.4975 },
+    { name: "Ely", state: "NV", lat: 39.2474, lon: -114.8886 }
   ],
   "2026-10-01": [
     { name: "Seattle", state: "WA", lat: 47.6062, lon: -122.3321 },

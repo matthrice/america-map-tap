@@ -37,7 +37,9 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch { /* private mode */ }
   }
   const store = loadStore();
-  const game = (dayKey && store[dayKey]) || { guesses: [] };
+  // A saved game only counts if the day's places haven't changed since it was played.
+  const sig = places.map((p) => p.name).join("|");
+  const game = (dayKey && store[dayKey]?.sig === sig && store[dayKey]) || { guesses: [], sig };
 
   // Cities show their state ("Boise, ID"); landmarks and names that already have one don't.
   const label = (p) => (p.landmark || p.name.includes(", ") ? p.name : `${p.name}, ${p.state}`);
