@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>MapTap USA</title>
+  <meta name="description" content="A daily US geography game. Tap the map where you think 5 places are.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23111'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>MapTap USA</h1>
+    <div class="header-right">
+      <span id="date-label"></span>
+      <button id="archive-btn" class="link-btn">Archive</button>
+      <button id="help-btn" class="link-btn">Help</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="rounds" aria-label="Rounds"></div>
+    <div id="prompt">
+      <div id="prompt-label">Tap the map</div>
+      <div id="prompt-name">Loading…</div>
+    </div>
+    <div id="map-wrap">
+      <svg id="map" viewBox="0 0 975 610" preserveAspectRatio="xMidYMid meet"></svg>
+      <button id="reset-zoom" class="link-btn">Reset zoom</button>
+    </div>
+    <div id="panel">
+      <div id="result"></div>
+      <button id="action-btn" disabled>Tap the map to guess</button>
+    </div>
+  </main>
+
+  <dialog id="summary">
+    <h2>Today's score</h2>
+    <div id="final-score"></div>
+    <div id="final-rounds"></div>
+    <div id="stats"></div>
+    <button id="share-btn">Share</button>
+    <div id="countdown"></div>
+    <form method="dialog"><button class="secondary">View map</button></form>
+  </dialog>
+
+  <dialog id="help">
+    <h2>How to play</h2>
+    <p>Every day you get <b>5 American places</b>. Tap where you think each one is, then confirm.</p>
+    <p>Closer guesses score more (up to 100 per round). Later rounds are worth more:
+      <b>×1, ×1, ×2, ×3, ×3</b> — 1,000 points max.</p>
+    <p>Pinch or scroll to zoom. Alaska and Hawaii are in the insets at bottom left.</p>
+    <p>A new challenge unlocks at midnight your local time.</p>
+    <form method="dialog"><button>Got it</button></form>
+  </dialog>
+
+  <dialog id="archive">
+    <h2>Archive</h2>
+    <ul id="archive-list"></ul>
+    <form method="dialog"><button class="secondary">Close</button></form>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+
+  <script src="vendor/d3.min.js"></script>
+  <script src="vendor/topojson-client.min.js"></script>
+  <script src="challenges.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
