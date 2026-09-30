@@ -41,8 +41,8 @@
 
   // ---------- Scoring ----------
   const distanceMi = (a, b) => d3.geoDistance([a.lon, a.lat], [b.lon, b.lat]) * EARTH_MI;
-  // 0 mi → 100, ~20 mi → 90, ~140 mi → 50, ~460 mi → 10.
-  const roundScore = (mi) => Math.max(0, Math.round(100 * Math.exp(-mi / 200)));
+  // Full marks within 15 mi, then decays: ~50 mi → 89, ~225 mi → 50, ~700 mi → 11.
+  const roundScore = (mi) => Math.min(100, Math.round(100 * Math.exp(-Math.max(0, mi - 15) / 300)));
   const total = (guesses) => guesses.reduce((s, g, i) => s + g.score * MULTIPLIERS[i], 0);
   const tier = (score) => (score >= 80 ? "good" : score >= 40 ? "ok" : "bad");
   const tierEmoji = { good: "🟢", ok: "🟡", bad: "🔴" };
@@ -188,7 +188,7 @@
   function setAction(text, enabled, handler) {
     const b = $("action-btn");
     b.textContent = text;
-    b.style.visibility = enabled ? "visible" : "hidden";
+    b.style.display = enabled ? "" : "none";
     b.onclick = handler;
   }
 
@@ -202,7 +202,10 @@
   }
 
   svg.on("click", (event) => {
-    if (!dayKey || revealed || round() >= places.length) return;
+    if (!dayKey) return;
+    // After a reveal, tapping the map moves on (same as the Next button).
+    if (revealed) { if (round() < places.length) startRound(); return; }
+    if (round() >= places.length) return;
     const [x, y] = d3.pointer(event, zoomLayer.node());
     const ll = projection.invert([x, y]);
     if (!ll) return;
@@ -228,8 +231,10 @@
     $("result").innerHTML =
       `<b>${fmtMi(mi)}</b> away · ` +
       `<b>${score}</b>${MULTIPLIERS[i] > 1 ? ` ×${MULTIPLIERS[i]} = <b>${pts}</b>` : ""} pts`;
-    if (round() < places.length) setAction("Next place →", true, startRound);
-    else setAction("See results", true, finish);
+    if (round() < places.length) {
+      setAction("Next place →", true, startRound);
+      $("prompt-label").textContent += " · tap map for next";
+    } else setAction("See results", true, finish);
   }
 
   function persist() {
