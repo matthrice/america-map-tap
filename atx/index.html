@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>ATX Tap</title>
+  <meta name="description" content="A daily Austin geography game. Tap the map where you think 5 places are.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23e2692a'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="atx.css">
+</head>
+<body>
+  <header>
+    <h1>ATX <span>Tap</span></h1>
+    <div class="header-right">
+      <span id="date-label"></span>
+      <a class="link-btn" href="../">USA</a>
+      <button id="archive-btn" class="link-btn">Archive</button>
+      <button id="help-btn" class="link-btn">Help</button>
+    </div>
+  </header>
+
+  <main id="stage">
+    <div id="map"></div>
+    <div id="top">
+      <div id="rounds" aria-label="Rounds"></div>
+      <div id="prompt">
+        <div id="prompt-label">Tap the map</div>
+        <div id="prompt-name">Loading…</div>
+      </div>
+      <div id="panel">
+        <div id="result"></div>
+        <button id="action-btn" style="display:none">Next</button>
+      </div>
+    </div>
+    <button id="reset-zoom" class="link-btn" title="Reset zoom" aria-label="Reset zoom">Reset</button>
+  </main>
+
+  <dialog id="summary">
+    <h2>Today's score</h2>
+    <div id="final-score"></div>
+    <div id="stats"></div>
+    <button id="share-btn">Share</button>
+    <div id="countdown"></div>
+    <form method="dialog"><button class="secondary">View map</button></form>
+  </dialog>
+
+  <dialog id="help">
+    <h2>How to play</h2>
+    <p>Every day you get <b>5 Austin places</b>. Tap where you think each one is.</p>
+    <p>Closer guesses score more (up to 100 per round). Later rounds are worth more:
+      <b>×1, ×1, ×2, ×3, ×3</b> — 1,000 points max.</p>
+    <p>Drag to move the map, pinch or scroll to zoom. Street names are shown; place names are not.</p>
+    <p>A new challenge unlocks at midnight your local time.</p>
+    <form method="dialog"><button>Got it</button></form>
+  </dialog>
+
+  <dialog id="archive">
+    <h2>Archive</h2>
+    <ul id="archive-list"></ul>
+    <form method="dialog"><button class="secondary">Close</button></form>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js"></script>
+  <script src="config.js"></script>
+  <script src="challenges.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
