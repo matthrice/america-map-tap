@@ -67,13 +67,13 @@
   zoom.on("end", () => svg.classed("dragging", false));
   svg.call(zoom).on("dblclick.zoom", null);
 
-  // Initial view: whole map on wide screens; on tall/narrow (phone) screens zoom in
+  // Initial view: whole map, with a little margin. On phone-width screens zoom in
   // up to 1.6x so the map fills more of the height — drag to reach the coasts.
   function fitTransform() {
     const { width, height } = svg.node().getBoundingClientRect();
     const [[x0, y0], [x1, y1]] = BOUNDS;
-    const contain = Math.min(width / (x1 - x0), height / (y1 - y0));
-    const s = Math.min(height / (y1 - y0), contain * 1.6);
+    const contain = 0.95 * Math.min(width / (x1 - x0), height / (y1 - y0));
+    const s = width < 600 ? Math.min(height / (y1 - y0), contain * 1.6) : contain;
     const [cx, cy] = s > contain ? [487.5, 305] : [(x0 + x1) / 2, (y0 + y1) / 2];
     return d3.zoomIdentity.translate(width / 2 - s * cx, height / 2 - s * cy).scale(s);
   }
@@ -309,13 +309,6 @@
   for (const d of document.querySelectorAll("dialog")) {
     d.addEventListener("click", (e) => { if (e.target === d) d.close(); });
   }
-
-  // ---------- Header border ----------
-  // Inline SVG flag (flag emoji doesn't render on Windows).
-  const FLAG = '<svg viewBox="0 0 19 10" preserveAspectRatio="none"><rect width="19" height="10" fill="#b22234"/>' +
-    [1, 3, 5, 7, 9].map((y) => `<rect y="${(y * 10) / 13}" width="19" height="${10 / 13}" fill="#fff"/>`).join("") +
-    '<rect width="7.6" height="5.38" fill="#3c3b6e"/></svg>';
-  $("freedom-strip").innerHTML = FLAG.repeat(80);
 
   // ---------- Boot ----------
   drawMap().then(() => {
