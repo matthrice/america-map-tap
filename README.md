@@ -30,4 +30,4 @@ ATX Tap (Austin), NYC Tap and Chicago Tap run on Mapbox (street names shown, pla
 
 ## Bet Tap (`bet/`)
 
-World-map betting game on a Mapbox globe (no labels). 10 places a day, the same for everyone: day N takes the next 10 places from one fixed shuffle of `bet/places.js`. Start with 1,000 chips; each place has a line (`r`, miles) and a payout (`pays`, profit × bet). Bet, tap, win or lose; cash out any time. Uses the shared Mapbox token in `city/config.js`.
+World-map betting game on a Mapbox globe (no labels). 7 places a day, the same for everyone: day N takes the next 7 places from one fixed shuffle of `bet/places.js`. Start with 1,000 chips; each place has a line (`r`, miles) and a payout (`pays`, profit × bet). Bet, tap, win or lose; cash out any time. Uses the shared Mapbox token in `city/config.js`.

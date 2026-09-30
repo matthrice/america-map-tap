@@ -3,7 +3,7 @@
 
   const START_CHIPS = 1000;
   const MIN_BET = 10;
-  const ROUNDS = 10;
+  const ROUNDS = 7;
   const STORAGE_KEY = "bet-tap-v1";
   const EPOCH = "2026-09-30"; // day 0
   const EARTH_MI = 3958.8;
@@ -19,7 +19,7 @@
   const dayIndex = Math.round((parseKey(todayKey) - parseKey(EPOCH)) / 864e5);
 
   // ---------- Today's places (same for everyone) ----------
-  // One fixed shuffle of the pool (seeded PRNG), then day N takes the next 10, so days
+  // One fixed shuffle of the pool (seeded PRNG), then day N takes the next ROUNDS, so days
   // don't repeat until the pool runs out.
   function mulberry32(a) {
     return () => {
@@ -83,7 +83,7 @@
   mapboxgl.accessToken = token;
   const map = new mapboxgl.Map({
     container: "map",
-    style: "mapbox://styles/mapbox/streets-v12",
+    style: "mapbox://styles/mapbox/outdoors-v12",
     projection: "globe",
     center: [10, 20],
     zoom: 1.3,
@@ -95,9 +95,11 @@
   map.touchZoomRotate.disableRotation();
 
   map.on("style.load", () => {
-    // Hide every label (countries, cities, roads, POIs). Borders stay.
+    // Topography only: hide every label, plus roads, borders, rail, buildings and other
+    // man-made layers. Terrain shading, land cover and water stay.
+    const MANMADE = /road|bridge|tunnel|admin|boundary|transit|aeroway|building|ferry|rail|path|golf|pitch|structure|gate|fence|barrier|landuse/;
     for (const layer of map.getStyle().layers) {
-      if (layer.type === "symbol") map.setLayoutProperty(layer.id, "visibility", "none");
+      if (layer.type === "symbol" || MANMADE.test(layer.id)) map.setLayoutProperty(layer.id, "visibility", "none");
     }
     map.setFog({ color: "#0e5a3a", "high-color": "#083a25", "space-color": "#06140d", "horizon-blend": 0.08, "star-intensity": 0.15 });
     map.addSource("ring", { type: "geojson", data: fc() });
@@ -167,7 +169,7 @@
 
   // ---------- Game flow ----------
   let bet = 0;
-  let phase = "bet"; // bet → tap → reveal
+  let phase = "bet"; // bet (stack chips, then tap) → reveal
   const round = () => game.results.length;
   const place = () => places[Math.min(round(), ROUNDS - 1)];
   const minBet = () => Math.min(MIN_BET, game.chips);
@@ -193,7 +195,8 @@
     const p = place();
     $("bet").textContent = fmt(bet);
     $("towin").textContent = fmt(bet * p.pays);
-    setAction("Lock bet", bet >= minBet() && bet > 0, lockBet);
+    $("result").textContent = bet > 0 ? "Tap the globe to play" : "";
+    setAction("", false, null);
   }
 
   function startRound() {
@@ -219,17 +222,11 @@
   }
   $("clear-btn").onclick = () => { bet = 0; renderBet(); };
 
-  function lockBet() {
-    phase = "tap";
-    $("betbox").style.display = "none";
-    $("result").innerHTML = `<b>${fmt(bet)}</b> on the line · tap the globe`;
-    setAction("", false, null);
-  }
-
   map.on("click", (e) => {
     if (game.done) return;
-    if (phase === "bet") { toast("Place your bet first"); return; }
     if (phase === "reveal") { next(); return; }
+    // Betting and tapping are one step: stack chips, then tap to play the round.
+    if (bet < minBet() || bet <= 0) { toast("Place your bet first"); return; }
     resolve({ lon: e.lngLat.lng, lat: e.lngLat.lat });
   });
 
@@ -241,6 +238,7 @@
     game.chips = Math.round(game.chips + delta);
     game.results.push({ name: p.name, bet, hit, delta: Math.round(delta), mi: +mi.toFixed(1), lat: +g.lat.toFixed(4), lon: +g.lon.toFixed(4) });
     phase = "reveal";
+    $("betbox").style.display = "none";
     const over = game.chips <= 0 || round() >= ROUNDS;
     if (over) finish(false);
     saveStore();
