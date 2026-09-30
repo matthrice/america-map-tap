@@ -309,9 +309,14 @@
   function shareText() {
     const date = parseKey(todayKey).toLocaleDateString(undefined, { month: "short", day: "numeric" });
     const up = game.chips - START_CHIPS;
+    // One line per round with the wager and what it won/lost (no place names, so no spoilers).
+    const rounds = game.results.map((r, i) =>
+      `${i + 1}. ${r.hit ? "🟢" : "🔴"} bet ${fmt(r.bet)} → ${r.delta >= 0 ? "+" : "−"}${fmt(Math.abs(r.delta))}`);
+    const ending = game.cashedOut ? `💰 cashed out after ${game.results.length}` : game.chips <= 0 ? "💥 busted" : null;
     return [
       `🎰 Bet Tap · ${date}`,
-      game.results.map((r) => (r.hit ? "🟢" : "🔴")).join("") + (game.cashedOut ? " 💰" : game.chips <= 0 ? " 💥" : ""),
+      ...rounds,
+      ...(ending ? [ending] : []),
       `${fmt(game.chips)} chips (${up >= 0 ? "+" : "−"}${fmt(Math.abs(up))})`,
       location.origin + location.pathname
     ].join("\n");
