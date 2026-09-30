@@ -1,0 +1,61 @@
+/* NYC Tap: urban/grey theme layered over the shared poster theme.
+   Subway-sign type, taxi yellow, and round markers styled like subway line bullets. */
+:root {
+  --paper: #e6e6e3;
+  --paper-2: #d4d4d0;
+  --ink: #161616;
+  --muted: #6e6e6e;
+  --forest: #161616;
+  --land: #00933c;   /* "good" round: subway green */
+  --gold: #fccc0a;   /* taxi / N-Q-R-W yellow */
+  --orange: #ff6319; /* B-D-F-M orange */
+  --rust: #ee352e;   /* 1-2-3 red */
+  --guess: #ff6319;
+  --answer: #fccc0a;
+  --shadow: 0 2px 0 rgba(0, 0, 0, .25);
+  --display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #141414;
+    --paper-2: #262626;
+    --ink: #f2f2f2;
+    --muted: #9a9a9a;
+    --forest: #000;
+    --shadow: 0 2px 0 rgba(0, 0, 0, .5);
+  }
+}
+
+header { background: #111; color: #fff; border-bottom-color: var(--gold); }
+h1 { font-weight: 700; letter-spacing: -.01em; text-transform: none; }
+h1 span { color: #111; background: var(--gold); padding: 0 6px; border-radius: 4px; margin-left: 2px; }
+
+/* Black station-sign prompt with a white rule, like subway signage */
+#prompt { background: #111; color: #fff; border-radius: 4px; border-top: 4px solid #fff; box-shadow: var(--shadow); }
+#prompt-name { font-weight: 700; letter-spacing: -.01em; text-transform: none; }
+#prompt-label { color: var(--gold); }
+
+/* Round markers as subway bullets */
+.round-dot {
+  min-width: 0; width: 34px; height: 34px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  font-weight: 700; font-size: .8rem;
+  background: #fff; color: #111; border: 2px solid #111;
+}
+.round-dot.current { background: #111; color: #fff; border-color: #111; }
+.round-dot.good { background: var(--land); border-color: var(--land); color: #fff; }
+.round-dot.ok { background: var(--gold); border-color: var(--gold); color: #111; }
+.round-dot.bad { background: var(--rust); border-color: var(--rust); color: #fff; }
+
+button { background: var(--gold); color: #111; border-radius: 4px; text-transform: none; letter-spacing: 0; font-weight: 700; }
+#reset-zoom, #result { border-color: #111; border-radius: 4px; }
+#result { text-transform: none; letter-spacing: 0; }
+dialog { border-color: #111; border-radius: 6px; }
+dialog h2 { background: #111; color: #fff; border-bottom-color: var(--gold); text-transform: none; letter-spacing: 0; }
+#final-score { color: var(--ink); }
+
+.pin { border-color: #fff; }
+.pin.answer { border-color: #111; }
+.pin .label { color: #fff; background: #111; border-color: #111; border-radius: 3px; font-weight: 700; text-transform: none; letter-spacing: 0; }

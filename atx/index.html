@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css">
-  <link rel="stylesheet" href="../style.css?v=2">
-  <link rel="stylesheet" href="atx.css?v=2">
+  <link rel="stylesheet" href="../style.css?v=3">
+  <link rel="stylesheet" href="../city/city.css?v=3">
 </head>
 <body>
   <header>
@@ -19,6 +19,7 @@
     <div class="header-right">
       <span id="date-label"></span>
       <a class="link-btn" href="../">USA</a>
+      <a class="link-btn" href="../nyc/">NYC</a>
       <button id="archive-btn" class="link-btn">Archive</button>
       <button id="help-btn" class="link-btn">Help</button>
     </div>
@@ -68,8 +69,16 @@
   <div id="toast" role="status"></div>
 
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js"></script>
-  <script src="config.js?v=2"></script>
-  <script src="challenges.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script>
+    window.CITY = {
+      storageKey: "atx-tap-v1",
+      shareTitle: "🤠 ATX Tap",
+      startBounds: [[-97.96, 30.13], [-97.62, 30.48]],
+      maxBounds: [[-98.35, 29.9], [-97.3, 30.75]]
+    };
+  </script>
+  <script src="../city/config.js?v=3"></script>
+  <script src="challenges.js?v=3"></script>
+  <script src="../city/app.js?v=3"></script>
 </body>
 </html>

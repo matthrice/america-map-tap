@@ -1,12 +1,13 @@
 (() => {
   "use strict";
 
+  // Per-city settings come from window.CITY (set in each city's index.html).
+  const CITY = window.CITY;
   const MULTIPLIERS = [1, 1, 2, 3, 3];
   const EARTH_MI = 3958.8;
-  const STORAGE_KEY = "atx-tap-v1";
-  // Initial view: central Austin out to the airport, COTA, Lakeline and Lake Travis.
-  const START_BOUNDS = [[-97.96, 30.13], [-97.62, 30.48]];
-  const MAX_BOUNDS = [[-98.35, 29.9], [-97.3, 30.75]];
+  const STORAGE_KEY = CITY.storageKey;
+  const START_BOUNDS = CITY.startBounds; // initial view
+  const MAX_BOUNDS = CITY.maxBounds; // how far you can pan
 
   const $ = (id) => document.getElementById(id);
 
@@ -35,7 +36,9 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch { /* private mode */ }
   }
   const store = loadStore();
-  const game = (dayKey && store[dayKey]) || { guesses: [] };
+  // A saved game only counts if the day's places haven't changed since it was played.
+  const sig = places.map((p) => p.name).join("|");
+  const game = (dayKey && store[dayKey]?.sig === sig && store[dayKey]) || { guesses: [], sig };
 
   // ---------- Scoring ----------
   const rad = (d) => (d * Math.PI) / 180;
@@ -57,7 +60,7 @@
     const el = document.createElement("div");
     el.id = "setup";
     el.innerHTML = window.mapboxgl
-      ? `<div><h2>Map not configured</h2><p>Add a Mapbox public token (starts with <code>pk.</code>) to <code>atx/config.js</code>.</p></div>`
+      ? `<div><h2>Map not configured</h2><p>Add a Mapbox public token (starts with <code>pk.</code>) to <code>city/config.js</code>.</p></div>`
       : `<div><h2>Map failed to load</h2><p>Couldn't reach Mapbox. Check your connection and reload.</p></div>`;
     $("stage").appendChild(el);
     $("prompt-name").textContent = "";
@@ -69,7 +72,7 @@
   mapboxgl.accessToken = token;
   const map = new mapboxgl.Map({
     container: "map",
-    style: "mapbox://styles/mapbox/streets-v12",
+    style: CITY.mapStyle || "mapbox://styles/mapbox/streets-v12",
     bounds: START_BOUNDS,
     maxBounds: MAX_BOUNDS,
     dragRotate: false,
@@ -90,7 +93,10 @@
     map.addLayer({
       id: "links", type: "line", source: "links",
       layout: { "line-cap": "round" },
-      paint: { "line-color": "#e2692a", "line-width": 3, "line-dasharray": [2, 1.5] }
+      paint: {
+        "line-color": getComputedStyle(document.documentElement).getPropertyValue("--orange").trim() || "#e2692a",
+        "line-width": 3, "line-dasharray": [2, 1.5]
+      }
     });
   });
 
@@ -278,7 +284,7 @@
 
   function shareText() {
     return [
-      `🤠 ATX Tap · ${prettyDate(dayKey, { month: "short", day: "numeric" })}`,
+      `${CITY.shareTitle} · ${prettyDate(dayKey, { month: "short", day: "numeric" })}`,
       game.guesses.map((g) => `${tierEmoji[tier(g.score)]}${g.score}`).join(" "),
       `Final score: ${total(game.guesses)}`,
       location.origin + location.pathname
