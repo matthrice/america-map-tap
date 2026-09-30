@@ -39,6 +39,9 @@
   const store = loadStore();
   const game = (dayKey && store[dayKey]) || { guesses: [] };
 
+  // Cities show their state ("Boise, ID"); landmarks and names that already have one don't.
+  const label = (p) => (p.landmark || p.name.includes(", ") ? p.name : `${p.name}, ${p.state}`);
+
   // ---------- Scoring ----------
   const distanceMi = (a, b) => d3.geoDistance([a.lon, a.lat], [b.lon, b.lat]) * EARTH_MI;
   // Full marks within 15 mi, then decays: ~50 mi → 89, ~225 mi → 50, ~700 mi → 11.
@@ -101,12 +104,11 @@
 
   async function drawMap() {
     const us = await (await fetch("data/states-albers-10m.json")).json();
-    const path = d3.geoPath();
-    statesLayer.selectAll("path")
-      .data(topojson.feature(us, us.objects.states).features)
-      .join("path")
+    // Country outline only (no state lines) to keep it challenging.
+    statesLayer.append("path")
+      .datum(topojson.feature(us, us.objects.nation))
       .attr("class", "state")
-      .attr("d", path);
+      .attr("d", d3.geoPath());
   }
 
   // ---------- Game flow ----------
@@ -134,7 +136,7 @@
     const p = places[i];
     const theme = places.find((x) => x.theme)?.theme;
     $("prompt-label").textContent = `Round ${i + 1} of ${places.length}` + (theme ? ` · ${theme}` : "");
-    $("prompt-name").textContent = p.name;
+    $("prompt-name").textContent = label(p);
   }
 
   function drawPin(cls, pt, label) {
@@ -154,7 +156,7 @@
     if (a && b) marksLayer.append("line").attr("class", "link-line")
       .attr("x1", a[0]).attr("y1", a[1]).attr("x2", b[0]).attr("y2", b[1]);
     drawPin("guess-pin", g);
-    drawPin("answer-pin", p, withLabel ? p.name : null);
+    drawPin("answer-pin", p, withLabel ? label(p) : null);
   }
 
   // Select effect: ripple at the tap, guess pin pops, line draws to the answer, answer pops.

@@ -78,6 +78,7 @@ h1 span { color: var(--gold); }
   border-radius: 0;
 }
 .link-btn:hover { opacity: 1; }
+a.link-btn { text-decoration: none; }
 
 /* Stage: the map fills everything below the header; UI floats on top */
 #stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
@@ -248,5 +249,6 @@ dialog form { margin-top: 8px; }
   #prompt-name { font-size: 1.4rem; }
   .round-dot { min-width: 36px; }
   #reset-zoom { top: 10px; right: 10px; padding: 2px 8px; font-size: .75rem; }
+  #reset-zoom::after { content: ""; position: absolute; inset: -12px; } /* bigger tap target */
   #top { top: 10px; }
 }

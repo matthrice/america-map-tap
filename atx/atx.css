@@ -2,7 +2,6 @@
 #map { position: absolute; inset: 0; }
 #map .mapboxgl-canvas-container { cursor: crosshair; }
 #map .mapboxgl-canvas-container:active { cursor: grabbing; }
-a.link-btn { color: inherit; text-decoration: none; }
 
 /* Pins are HTML markers so they can animate with CSS. */
 .pin {

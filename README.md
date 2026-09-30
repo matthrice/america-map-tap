@@ -23,3 +23,7 @@ node scripts/validate.js
 Served directly from the repo root. One-time setup: **Settings → Pages → Source: Deploy from a branch**, pick the branch, folder `/ (root)`.
 
 Map data: [us-atlas](https://github.com/topojson/us-atlas) (Census Bureau). Libraries: d3, topojson-client (vendored).
+
+## ATX Tap (`atx/`)
+
+Austin version on Mapbox (street names shown, place labels hidden). Needs a Mapbox **public** token (`pk.…`) in `atx/config.js`; restrict it to your Pages URL in the Mapbox dashboard. Places live in `atx/challenges.js`; open `atx/?review` to see every place on the map and check coordinates.
