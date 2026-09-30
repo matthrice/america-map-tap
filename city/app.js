@@ -47,8 +47,20 @@
       Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(rad(b.lon - a.lon) / 2) ** 2;
     return 2 * EARTH_MI * Math.asin(Math.sqrt(h));
   }
-  // City scale. Full marks within ~500 ft, then decays: 0.5 mi → 77, 1 mi → 55, 2 mi → 28, 4 mi → 7.
-  const roundScore = (mi) => Math.min(100, Math.round(100 * Math.exp(-Math.max(0, mi - 0.1) / 1.5)));
+  // Density-aware scoring. Every place in the city's challenge list is a landmark; a miss
+  // counts against you mostly when other landmarks are closer to your tap than the answer
+  // (i.e. you hit the wrong spot in a busy area). A miss in a sparse area costs little.
+  // The score is the better of that and a plain distance score, so it's never harsher
+  // than distance alone. Full marks within ~500 ft.
+  const LANDMARKS = [...new Map(Object.values(window.CHALLENGES).flat().map((p) => [p.name, p])).values()];
+  function roundScore(guessPt, answer) {
+    const mi = distanceMi(guessPt, answer);
+    const closer = LANDMARKS.filter((p) => p.name !== answer.name && distanceMi(guessPt, p) < mi).length;
+    if (mi <= 0.1) return { mi, closer, score: 100 };
+    const byDistance = 100 * Math.exp(-(mi - 0.1) / 1.5); // 0.5 mi → 77, 1 mi → 55, 2 mi → 28
+    const byDensity = 100 * Math.exp(-closer / 8) * Math.exp(-(mi - 0.1) / 5); // nothing closer: 2 mi → 68
+    return { mi, closer, score: Math.min(100, Math.round(Math.max(byDistance, byDensity))) };
+  }
   const total = (guesses) => guesses.reduce((s, g, i) => s + g.score * MULTIPLIERS[i], 0);
   const tier = (score) => (score >= 80 ? "good" : score >= 40 ? "ok" : "bad");
   const tierEmoji = { good: "🟢", ok: "🟡", bad: "🔴" };
@@ -235,9 +247,8 @@
   function guess(pt) {
     const i = round();
     const p = places[i];
-    const mi = distanceMi(pt, p);
-    const score = roundScore(mi);
-    game.guesses.push({ lat: +pt.lat.toFixed(5), lon: +pt.lon.toFixed(5), mi: +mi.toFixed(3), score });
+    const { mi, closer, score } = roundScore(pt, p);
+    game.guesses.push({ lat: +pt.lat.toFixed(5), lon: +pt.lon.toFixed(5), mi: +mi.toFixed(3), closer, score });
     persist();
     revealed = true;
     clearMarks();
@@ -247,7 +258,7 @@
     setPrompt();
     const pts = score * MULTIPLIERS[i];
     $("result").innerHTML =
-      `<b>${fmtDist(mi)}</b> away · ` +
+      `<b>${fmtDist(mi)}</b> away · ${closer ? `<b>${closer}</b> ${closer === 1 ? "place" : "places"} closer` : "nothing closer"} · ` +
       `<b>${score}</b>${MULTIPLIERS[i] > 1 ? ` ×${MULTIPLIERS[i]} = <b>${pts}</b>` : ""} pts`;
     if (round() < places.length) {
       setAction("Next place →", true, startRound);

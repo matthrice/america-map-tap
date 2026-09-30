@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Shrikhand&family=Work+Sans:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css">
-  <link rel="stylesheet" href="../style.css?v=5">
-  <link rel="stylesheet" href="../city/city.css?v=5">
-  <link rel="stylesheet" href="atx.css?v=5">
+  <link rel="stylesheet" href="../style.css?v=6">
+  <link rel="stylesheet" href="../city/city.css?v=6">
+  <link rel="stylesheet" href="atx.css?v=6">
 </head>
 <body>
   <header>
@@ -55,7 +55,8 @@
   <dialog id="help">
     <h2>How to play</h2>
     <p>Every day you get <b>5 Austin places</b>. Tap where you think each one is.</p>
-    <p>Closer guesses score more (up to 100 per round). Later rounds are worth more:
+    <p>Closer guesses score more (up to 100 per round). Misses hurt most when other landmarks are
+      closer to your tap than the answer; in quieter areas, being a mile or two off is fine. Later rounds are worth more:
       <b>×1, ×1, ×2, ×3, ×3</b> — 1,000 points max.</p>
     <p>Drag to move the map, pinch or scroll to zoom. Street names are shown; place names are not.</p>
     <p>A new challenge unlocks at midnight your local time.</p>
@@ -80,8 +81,8 @@
       maxBounds: [[-98.35, 29.9], [-97.3, 30.75]]
     };
   </script>
-  <script src="../city/config.js?v=5"></script>
-  <script src="challenges.js?v=5"></script>
-  <script src="../city/app.js?v=5"></script>
+  <script src="../city/config.js?v=6"></script>
+  <script src="challenges.js?v=6"></script>
+  <script src="../city/app.js?v=6"></script>
 </body>
 </html>
