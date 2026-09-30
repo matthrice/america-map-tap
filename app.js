@@ -49,17 +49,50 @@
   const fmtMi = (mi) => (mi < 10 ? mi.toFixed(1) : Math.round(mi).toLocaleString()) + " mi";
 
   // ---------- Map ----------
+  // Map content lives in projected coordinates; the zoom transform maps it to screen pixels.
+  // Drag to pan, wheel/pinch to zoom, click/tap (without dragging) to guess.
+  const BOUNDS = [[-60, 10], [960, 610]]; // lower 48 + Alaska/Hawaii insets
+  const SLACK = 250; // how far past the map edges you can drag
   let k = 1; // current zoom scale
+  let minK = 1;
   const zoom = d3.zoom()
-    .scaleExtent([1, 12])
-    .translateExtent([[0, 0], [975, 610]])
+    .clickDistance(5)
+    .translateExtent([[BOUNDS[0][0] - SLACK, BOUNDS[0][1] - SLACK], [BOUNDS[1][0] + SLACK, BOUNDS[1][1] + SLACK]])
     .on("zoom", (e) => {
       k = e.transform.k;
       zoomLayer.attr("transform", e.transform);
       rescaleMarks();
     });
   svg.call(zoom).on("dblclick.zoom", null);
-  $("reset-zoom").onclick = () => svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity);
+
+  // Initial view: whole map on wide screens; on tall/narrow (phone) screens zoom in
+  // up to 1.6x so the map fills more of the height — drag to reach the coasts.
+  function fitTransform() {
+    const { width, height } = svg.node().getBoundingClientRect();
+    const [[x0, y0], [x1, y1]] = BOUNDS;
+    const contain = Math.min(width / (x1 - x0), height / (y1 - y0));
+    const s = Math.min(height / (y1 - y0), contain * 1.6);
+    const [cx, cy] = s > contain ? [487.5, 305] : [(x0 + x1) / 2, (y0 + y1) / 2];
+    return d3.zoomIdentity.translate(width / 2 - s * cx, height / 2 - s * cy).scale(s);
+  }
+  function fullScale() {
+    const { width, height } = svg.node().getBoundingClientRect();
+    const [[x0, y0], [x1, y1]] = BOUNDS;
+    return Math.min(width / (x1 - x0), height / (y1 - y0));
+  }
+  function resetView(animate) {
+    const t = fitTransform();
+    minK = Math.min(t.k, fullScale()) * 0.8;
+    zoom.extent([[0, 0], [svg.node().clientWidth, svg.node().clientHeight]]).scaleExtent([minK, t.k * 15]);
+    (animate ? svg.transition().duration(400) : svg).call(zoom.transform, t);
+  }
+  $("reset-zoom").onclick = () => resetView(true);
+  // Refit only when the width changes, so mobile address-bar show/hide doesn't reset the view.
+  let lastWidth = 0;
+  new ResizeObserver(() => {
+    const w = svg.node().clientWidth;
+    if (w !== lastWidth) { lastWidth = w; resetView(false); }
+  }).observe(svg.node());
 
   function rescaleMarks() {
     marksLayer.selectAll("circle").attr("r", 7 / k).attr("stroke-width", 2 / k);
@@ -74,12 +107,10 @@
       .data(topojson.feature(us, us.objects.states).features)
       .join("path")
       .attr("class", "state")
-      .attr("d", path)
-      .attr("stroke-width", 0.8);
+      .attr("d", path);
   }
 
   // ---------- Game flow ----------
-  let pending = null;   // {lat, lon} of an unconfirmed guess
   let revealed = false; // showing result for the current round
 
   const round = () => game.guesses.length;
@@ -132,13 +163,12 @@
   function setAction(text, enabled, handler) {
     const b = $("action-btn");
     b.textContent = text;
-    b.disabled = !enabled;
+    b.style.visibility = enabled ? "visible" : "hidden";
     b.onclick = handler;
   }
 
   function startRound() {
     revealed = false;
-    pending = null;
     clearMarks();
     renderRounds();
     setPrompt();
@@ -151,22 +181,16 @@
     const [x, y] = d3.pointer(event, zoomLayer.node());
     const ll = projection.invert([x, y]);
     if (!ll) return;
-    pending = { lon: ll[0], lat: ll[1] };
-    clearMarks();
-    drawPin("guess-pin", pending);
-    rescaleMarks();
-    setAction("Confirm guess", true, confirmGuess);
+    guess({ lon: ll[0], lat: ll[1] });
   });
 
-  function confirmGuess() {
-    if (!pending) return;
+  function guess(pt) {
     const i = round();
     const p = places[i];
-    const mi = distanceMi(pending, p);
+    const mi = distanceMi(pt, p);
     const score = roundScore(mi);
-    game.guesses.push({ lat: +pending.lat.toFixed(4), lon: +pending.lon.toFixed(4), mi: +mi.toFixed(1), score });
+    game.guesses.push({ lat: +pt.lat.toFixed(4), lon: +pt.lon.toFixed(4), mi: +mi.toFixed(1), score });
     persist();
-    pending = null;
     revealed = true;
     clearMarks();
     drawRound(i, true);
@@ -283,6 +307,14 @@
   for (const d of document.querySelectorAll("dialog")) {
     d.addEventListener("click", (e) => { if (e.target === d) d.close(); });
   }
+
+  // ---------- Header border ----------
+  // Inline SVG flag (flag emoji doesn't render on Windows).
+  const FLAG = '<svg viewBox="0 0 19 10" preserveAspectRatio="none"><rect width="19" height="10" fill="#b22234"/>' +
+    [1, 3, 5, 7, 9].map((y) => `<rect y="${(y * 10) / 13}" width="19" height="${10 / 13}" fill="#fff"/>`).join("") +
+    '<rect width="7.6" height="5.38" fill="#3c3b6e"/></svg>';
+  $("freedom-strip").innerHTML = Array.from({ length: 60 }, (_, i) =>
+    ["<span>🦅</span>", FLAG, "<span>🌭</span>", FLAG][i % 4]).join("");
 
   // ---------- Boot ----------
   drawMap().then(() => {

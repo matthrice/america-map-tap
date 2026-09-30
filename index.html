@@ -10,13 +10,14 @@
 </head>
 <body>
   <header>
-    <h1>MapTap USA</h1>
+    <h1>🦅 MapTap USA 🌭</h1>
     <div class="header-right">
       <span id="date-label"></span>
       <button id="archive-btn" class="link-btn">Archive</button>
       <button id="help-btn" class="link-btn">Help</button>
     </div>
   </header>
+  <div id="freedom-strip" aria-hidden="true"></div>
 
   <main>
     <div id="rounds" aria-label="Rounds"></div>
@@ -25,12 +26,12 @@
       <div id="prompt-name">Loading…</div>
     </div>
     <div id="map-wrap">
-      <svg id="map" viewBox="0 0 975 610" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg id="map"></svg>
       <button id="reset-zoom" class="link-btn">Reset zoom</button>
     </div>
     <div id="panel">
       <div id="result"></div>
-      <button id="action-btn" disabled>Tap the map to guess</button>
+      <button id="action-btn" style="visibility:hidden">Next</button>
     </div>
   </main>
 
@@ -45,10 +46,10 @@
 
   <dialog id="help">
     <h2>How to play</h2>
-    <p>Every day you get <b>5 American places</b>. Tap where you think each one is, then confirm.</p>
+    <p>Every day you get <b>5 American places</b>. Tap where you think each one is.</p>
     <p>Closer guesses score more (up to 100 per round). Later rounds are worth more:
       <b>×1, ×1, ×2, ×3, ×3</b> — 1,000 points max.</p>
-    <p>Pinch or scroll to zoom. Alaska and Hawaii are in the insets at bottom left.</p>
+    <p>Drag to move the map, pinch or scroll to zoom. Alaska and Hawaii are in the insets at bottom left.</p>
     <p>A new challenge unlocks at midnight your local time.</p>
     <form method="dialog"><button>Got it</button></form>
   </dialog>
