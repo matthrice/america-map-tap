@@ -106,9 +106,6 @@ dialog p b { color: var(--ink); }
 #final-score { color: var(--gold); font-family: var(--display); font-weight: 900; }
 #over-sub { color: var(--muted); margin-bottom: 14px; }
 #stats b, #stats-all b { color: var(--gold); }
-#stats-all { display: flex; flex-wrap: wrap; justify-content: space-around; gap: 12px; margin-bottom: 16px; }
-#stats-all div { display: flex; flex-direction: column; font: 500 .75rem "Work Sans"; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); min-width: 90px; }
-#stats-all b { font: 900 1.4rem var(--display); letter-spacing: 0; }
 button.secondary { color: var(--muted); background: none; }
 
 .pin.guess { background: var(--guess); border-color: #fff; }
@@ -121,7 +118,14 @@ button.secondary { color: var(--muted); background: none; }
   #bank { gap: 10px; }
 }
 
-/* results dialog stats: same wrapped layout as the Stats dialog */
-#over #stats { flex-wrap: wrap; gap: 12px; }
-#over #stats div { font: 500 .72rem "Work Sans", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); min-width: 84px; }
-#over #stats b { font: 900 1.4rem var(--display); letter-spacing: 0; color: var(--gold); }
+/* Stats (results + Stats dialogs): a tidy grid, 3 across, with room between labels */
+#over #stats, #stats-all {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 10px;
+  margin: 0 20px 18px;
+}
+#over #stats div, #stats-all div {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 0;
+  font: 500 .68rem/1.25 "Work Sans", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+#over #stats b, #stats-all b { font: 900 1.5rem/1.1 var(--display); letter-spacing: 0; color: var(--gold); }

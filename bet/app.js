@@ -291,7 +291,7 @@
 
   function statsHTML(s) {
     return `<div><b>${s.played}</b>played</div><div><b>${fmt(s.avg)}</b>average</div>` +
-      `<div><b>${fmt(s.best)}</b>best</div><div><b>${s.winning}</b>in profit</div><div><b>${s.streak}</b>profit streak</div>`;
+      `<div><b>${fmt(s.best)}</b>best</div><div><b>${s.winning}</b>in profit</div><div><b>${s.streak}</b>streak</div>`;
   }
 
   function showOver() {
