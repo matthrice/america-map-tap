@@ -59,10 +59,12 @@
     .clickDistance(5)
     .translateExtent([[BOUNDS[0][0] - SLACK, BOUNDS[0][1] - SLACK], [BOUNDS[1][0] + SLACK, BOUNDS[1][1] + SLACK]])
     .on("zoom", (e) => {
+      if (e.sourceEvent?.type === "mousemove") svg.classed("dragging", true);
       k = e.transform.k;
       zoomLayer.attr("transform", e.transform);
       rescaleMarks();
     });
+  zoom.on("end", () => svg.classed("dragging", false));
   svg.call(zoom).on("dblclick.zoom", null);
 
   // Initial view: whole map on wide screens; on tall/narrow (phone) screens zoom in
@@ -313,8 +315,7 @@
   const FLAG = '<svg viewBox="0 0 19 10" preserveAspectRatio="none"><rect width="19" height="10" fill="#b22234"/>' +
     [1, 3, 5, 7, 9].map((y) => `<rect y="${(y * 10) / 13}" width="19" height="${10 / 13}" fill="#fff"/>`).join("") +
     '<rect width="7.6" height="5.38" fill="#3c3b6e"/></svg>';
-  $("freedom-strip").innerHTML = Array.from({ length: 60 }, (_, i) =>
-    ["<span>🦅</span>", FLAG, "<span>🌭</span>", FLAG][i % 4]).join("");
+  $("freedom-strip").innerHTML = FLAG.repeat(80);
 
   // ---------- Boot ----------
   drawMap().then(() => {
