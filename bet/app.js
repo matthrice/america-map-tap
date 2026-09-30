@@ -95,11 +95,14 @@
   map.touchZoomRotate.disableRotation();
 
   map.on("style.load", () => {
-    // Topography only: hide every label, plus roads, borders, rail, buildings and other
-    // man-made layers. Terrain shading, land cover and water stay.
+    // Topography plus country borders: hide every label, roads, state/province lines, rail,
+    // buildings and other man-made layers. Terrain shading, land cover, water and
+    // country (admin-0) borders stay.
     const MANMADE = /road|bridge|tunnel|admin|boundary|transit|aeroway|building|ferry|rail|path|golf|pitch|structure|gate|fence|barrier|landuse/;
+    const COUNTRY_BORDER = /^admin-0/;
     for (const layer of map.getStyle().layers) {
-      if (layer.type === "symbol" || MANMADE.test(layer.id)) map.setLayoutProperty(layer.id, "visibility", "none");
+      const hide = layer.type === "symbol" || (MANMADE.test(layer.id) && !COUNTRY_BORDER.test(layer.id));
+      if (hide) map.setLayoutProperty(layer.id, "visibility", "none");
     }
     map.setFog({ color: "#0e5a3a", "high-color": "#083a25", "space-color": "#06140d", "horizon-blend": 0.08, "star-intensity": 0.15 });
     map.addSource("ring", { type: "geojson", data: fc() });
